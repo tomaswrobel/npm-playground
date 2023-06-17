@@ -1,0 +1,16 @@
+body {
+    display: grid;
+    grid-template-areas: "editor preview";
+    grid-template-rows: 100vh;
+    grid-template-columns: 1fr 1fr;
+    margin: 0;
+    padding: 0;
+}
+
+code-editor {
+    grid-area: editor;
+}
+
+code-runner {
+    grid-area: preview;
+}
