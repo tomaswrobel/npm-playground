@@ -3,10 +3,7 @@ import {customElement, property, query} from "lit/decorators.js";
 import * as Babel from "@babel/core";
 import cssCode from "bundle-text:./css.txt";
 import jsCode from "bundle-text:./js.txt";
-import counter from "bundle-text:./counter.txt";
-import * as files from "./file-icons.json";
 import {saveAs} from "file-saver";
-import JSZip from "jszip";
 
 function close(this: NPMPlayground, file: string) {
   if (this.tabs.length > 1) {
@@ -21,14 +18,6 @@ function open(this: NPMPlayground, file: string) {
   this.file = file;
 }
 
-function getIcon(filename: string) {
-  const {name} =
-    files.icons.find(file => file.fileNames?.includes(filename)) ||
-    files.icons.find(file => file.fileExtensions?.some(ext => filename.endsWith("." + ext))) ||
-    files.defaultIcon;
-  return `https://raw.githubusercontent.com/PKief/vscode-material-icon-theme/main/icons/${name}.svg`;
-}
-
 @customElement("npm-playground")
 class NPMPlayground extends LitElement {
   static styles = css`
@@ -38,20 +27,7 @@ class NPMPlayground extends LitElement {
       grid-template-rows: auto 1fr;
       grid-template-columns: 200px 1fr 1fr;
       width: 100vw;
-    }
-
-    .console {
-      grid-area: preview;
-      height: 25vh;
-      width: 50vw;
-      place-self: end;
-    }
-
-    img {
-      width: 1em;
-      height: 1em;
-      margin-right: 0.5em;
-      transform: translateY(0.125em);
+      height: 100vh;
     }
 
     nav {
@@ -71,6 +47,8 @@ class NPMPlayground extends LitElement {
       margin: 0;
       padding: 0;
       border-right: 1px solid #30363d;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
 
     .file-explorer li {
@@ -150,11 +128,10 @@ class NPMPlayground extends LitElement {
   files: Record<string, string> = {
     "index.css": cssCode,
     "index.tsx": jsCode,
-    "Counter.tsx": counter,
   };
 
   @property({type: Array})
-  tabs: string[] = ["Counter.tsx", "index.css"];
+  tabs: string[] = ["index.tsx", "index.css"];
 
   @query("iframe")
   iframe!: HTMLIFrameElement;
@@ -162,11 +139,13 @@ class NPMPlayground extends LitElement {
   @query("nav")
   nav!: HTMLElement;
 
+  @query(".file-explorer")
+  fileExplorer!: HTMLUListElement;
+
   render() {
     const tabs = this.tabs.map(
       file => html`
         <button ?data-active=${this.file === file} @click=${() => (this.file = file)}>
-          <img src=${getIcon(file)} />
           ${file}
           <span @click=${close.bind(this, file)}>×</span>
         </button>
@@ -180,12 +159,14 @@ class NPMPlayground extends LitElement {
         <button @click=${this.run}>▶</button>
       </nav>
       <ul class="file-explorer">
+        <li @click=${this.openGithub}>Star on GitHub</li>
+        <li class="divider"></li>
         <li @click=${this.download}>Save as...</li>
         <li @click=${this.upload}>Open...</li>
         <li @click=${this.newFile}>New file...</li>
         <li class="divider"></li>
         ${Object.keys(this.files).map(
-          file => html`<li @click=${open.bind(this, file)}><img src=${getIcon(file)} />${file}</li>`
+          file => html`<li @click=${open.bind(this, file)}>${file}</li>`
         )}
       </ul>
       <code-editor
@@ -198,6 +179,10 @@ class NPMPlayground extends LitElement {
     `;
   }
 
+  openGithub() {
+    window.open("https://github.com/tomas-wrobel/npm-playground", "_blank");
+  }
+
   updateCode(e: CustomEvent<string>) {
     this.files[this.file] = e.detail;
   }
@@ -206,14 +191,19 @@ class NPMPlayground extends LitElement {
     this.iframe.src = "about:blank";
   }
 
-  memory: string[] = [];
+  private imports: Record<string, string> = {
+    "npm/": "https://esm.sh/",
+  };
 
   async transpile() {
-    const imports: Record<string, string> = {
-      "npm/": "https://esm.sh/",
-    };
+    for (const src in this.imports) {
+      if (src !== "npm/") {
+        URL.revokeObjectURL(this.imports[src]);
+        delete this.imports[src];
+      }
+    }
 
-    this.memory.forEach(URL.revokeObjectURL);
+    const document = this.iframe.contentDocument!;
 
     for (const filename in this.files) {
       const file = filename.slice(0, filename.lastIndexOf("."));
@@ -254,33 +244,32 @@ class NPMPlayground extends LitElement {
           continue;
         }
 
-        const url = URL.createObjectURL(
+        this.imports[`local/${file}`] = URL.createObjectURL(
           new File([js.code || ""], filename, {type: "text/javascript"})
         );
-
-        this.memory.push(url);
-        imports[`local/${file}`] = url;
       } else if (ext === "json") {
-        const url = URL.createObjectURL(
+        this.imports[`local/${filename}`] = URL.createObjectURL(
           new File([this.files[filename]], filename, {
             type: "application/json",
           })
         );
-
-        this.memory.push(url);
-        imports[`local/${filename}`] = url;
+      } else if (ext === "css") {
+        this.imports[`local/${filename}`] = URL.createObjectURL(
+          new Blob(
+            [
+              `document.head.appendChild(document.createElement("style")).textContent=${JSON.stringify(
+                this.files[filename]
+              )};export{};`,
+            ],
+            {type: "text/javascript"}
+          )
+        );
       }
     }
 
-    const document = this.iframe.contentDocument!;
-
-    const style = document.createElement("style");
-    style.textContent = this.files["index.css"];
-    document.head.appendChild(style);
-
     const importmap = document.createElement("script");
     importmap.type = "importmap";
-    importmap.textContent = JSON.stringify({imports});
+    importmap.textContent = JSON.stringify({imports: this.imports});
     document.head.appendChild(importmap);
 
     const script = document.createElement("script");
@@ -289,33 +278,15 @@ class NPMPlayground extends LitElement {
     document.body.appendChild(script);
   }
 
-  addFile() {
-    const file = prompt("File name:", ".tsx");
-
-    if (!file) {
-      return;
-    }
-
-    this.files[file] = "";
-    this.file = file;
-    this.requestUpdate();
-  }
-
   newFile() {
     const li = document.createElement("li");
-    const img = document.createElement("img");
-    img.src = getIcon("");
     const input = document.createElement("input");
+    const validFile = /^[\w\.-]+?$/;
 
-    li.appendChild(img);
     li.appendChild(input);
 
-    input.oninput = () => {
-      img.src = getIcon(input.value);
-    };
-
     input.onblur = () => {
-      if (input.value) {
+      if (input.value && validFile.test(input.value)) {
         this.files[input.value] = "";
         this.tabs.push(input.value);
         this.file = input.value;
@@ -329,38 +300,26 @@ class NPMPlayground extends LitElement {
       }
     };
 
-    this.shadowRoot!.querySelector(".file-explorer")!.appendChild(li);
-
+    this.fileExplorer.appendChild(li);
     input.focus();
   }
 
-  async download() {
-    const zip = new JSZip();
-
-    for (const filename in this.files) {
-      zip.file(filename, this.files[filename]);
-    }
-
-    saveAs(await zip.generateAsync({type: "blob"}), "untitled.npmplg");
+  download() {
+    saveAs(new Blob([JSON.stringify(this.files)], {type: "application/json"}), "untitled.npmplg");
   }
 
-  async upload() {
+  upload() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".npmplg";
     input.onchange = async () => {
-      const zip = await JSZip.loadAsync(await input.files![0].arrayBuffer());
-
-      for (const filename in zip.files) {
-        this.files[filename] = await zip.files[filename].async("text");
-      }
-
+      this.files = JSON.parse(await input.files![0].text());
       this.requestUpdate();
     };
 
     input.click();
   }
- 
+
   updated() {
     if (this.tabs.indexOf(this.file) === -1) {
       this.file = this.tabs[0];

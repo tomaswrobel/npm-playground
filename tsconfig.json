@@ -3,8 +3,9 @@
         "target": "ES2015",
         "noEmit": true,
         "strict": true,
-        "module": "ES2015",
-        "moduleResolution": "bundler",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
         "experimentalDecorators": true
     }
 }
