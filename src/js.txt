@@ -5,7 +5,7 @@
  */
 import * as ReactDOM from "react-dom";
 import * as React from "react";
-import "./style.css";
+import "./index.css";
 
 function Counter() {
 	const [count, setCount] = React.useState(0);
