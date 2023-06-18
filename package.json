@@ -13,8 +13,7 @@
         "@types/file-saver": "^2.0.5"
     },
     "scripts": {
-        "build": "parcel build index.html",
-        "dev": "parcel index.html"
+        "build": "webpack"
     },
     "targets": {
         "default": {

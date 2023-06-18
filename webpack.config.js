@@ -2,7 +2,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MonacoEditorWebpackPlugin = require("monaco-editor-webpack-plugin");
 
 module.exports = /** @type {import("webpack").Configuration} */ ({
-    entry: "./src/components/code-editor.ts",
+    entry: "./src/main.ts",
     module: {
         rules: [
             {
