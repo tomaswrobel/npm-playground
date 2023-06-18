@@ -1,1 +1,0 @@
-export function highlightElement(element: HTMLElement, async?: boolean, callback?: () => void): void;
