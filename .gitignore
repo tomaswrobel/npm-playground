@@ -1,0 +1,6 @@
+# parcel
+dist/
+.parcel-cache
+
+# yarn
+node_modules/

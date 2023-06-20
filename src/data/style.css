@@ -1,0 +1,122 @@
+body {
+    display: grid;
+    grid-template-areas: "file-explorer tabs preview" "file-explorer editor preview";
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 200px 1fr 1fr;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+}
+
+nav {
+    grid-area: tabs;
+    overflow: auto;
+}
+
+main {
+    grid-area: editor;
+    overflow: scroll;
+    display: grid;
+}
+
+textarea,
+pre {
+    all: unset;
+    overflow: unset !important;
+    grid-area: 1 / 1;
+    font-family: monospace !important;
+    white-space: pre !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    tab-size: 4 !important;
+    padding: 3px 5px !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+}
+
+textarea {
+    caret-color: #c9d1d9;
+    -webkit-text-fill-color: transparent;
+}
+
+.file-explorer {
+    grid-area: file-explorer;
+    background:  #272922;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    border-right: 1px solid #30363d;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.file-explorer li {
+    list-style: none;
+    padding: 10px;
+    color: #c9d1d9;
+    cursor: pointer;
+    font: 16px sans-serif;
+    display: inline-block;
+}
+
+.file-explorer li:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+li.divider {
+    height: 1px;
+    padding: 0px !important;
+    background: #161711 !important;
+}
+
+iframe {
+    grid-area: preview;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+nav button {
+    all: unset;
+    color: #c9d1d9;
+    padding: 8px;
+    font: 16px sans-serif;
+}
+
+button.active {
+    background: #272822;
+}
+
+nav {
+    display: flex;
+    background: #383933;
+}
+
+div {
+    flex-grow: 1;
+}
+
+.close {
+    margin: 0 0px 0 10px;
+}
+
+.close::after  {
+    content: "×";
+}
+
+.file-explorer input {
+    background: #383933;
+    color: #c9d1d9;
+    width: 100px;
+    border: 1px solid #30363d;
+}
+
+button,
+li {
+    cursor: pointer;
+}
+
+button:not(.active)>.close {
+    visibility: hidden;
+}

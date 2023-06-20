@@ -18,8 +18,7 @@ function Counter() {
 	);
 }
 
-
 ReactDOM.render(
 	<Counter />,
 	document.body
-)
+);
