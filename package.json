@@ -10,6 +10,7 @@
 		"prismjs": "^1.29.0"
 	},
 	"devDependencies": {
+		"@parcel/resolver-glob": "^2.9.2",
 		"@parcel/transformer-inline-string": "2.9.2",
 		"@types/babel__core": "7.20.1",
 		"@types/file-saver": "2.0.5",

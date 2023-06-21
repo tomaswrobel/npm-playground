@@ -4,6 +4,7 @@ import {saveAs} from "file-saver";
 import css from "bundle-text:../data/css.txt?raw";
 import js from "bundle-text:../data/js.txt?raw";
 import getIcon from "./get-icon";
+import licenses from "../licenses";
 
 class FileExplorer extends Component.create({
     tag: "ul",
@@ -30,6 +31,7 @@ class FileExplorer extends Component.create({
                     "_blank"
                 )
             ),
+            this.licenses = this.li("Licenses", licenses),
             this.divider(),
             this.open = this.li("Open...", this.upload.bind(this)),
             this.saveAs = this.li("Export...", this.download),
@@ -76,6 +78,7 @@ class FileExplorer extends Component.create({
 
         this.element.append(
             this.githubLink,
+            this.licenses,
             this.divider(),
             this.open,
             this.saveAs,
@@ -139,6 +142,7 @@ interface FileExplorer {
     open: HTMLLIElement;
     newFile: HTMLLIElement;
     itemsDivider: HTMLLIElement;
+    licenses: HTMLLIElement;
 }
 
 export default new FileExplorer();

@@ -11,11 +11,17 @@ class Preview extends Component.create({
     }
 }) {
     init() {
+        this.element.name = "output";
+
         this.on("run", () => {
             this.element.src = "about:blank";
         });
 
         this.element.onload = async () => {
+            if (this.element.src !== "about:blank") {
+                return;
+            }
+
             for (const src in this.imports) {
                 if (src !== "npm/") {
                     URL.revokeObjectURL(this.imports[src]);

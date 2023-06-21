@@ -54,9 +54,7 @@ class Nav extends Component.create({
     }
 
     open(tab: string) {
-        if (!this.tabs.has(tab)) {
-            this.tabs.add(tab);
-        }
+        this.tabs.add(tab);
         this.current = tab;
         this.update();
         this.emit("open", tab);
@@ -75,16 +73,22 @@ class Nav extends Component.create({
         const element = document.createElement("span");
 
         element.classList.add("close");
+        /* Not implemented yet
         element.onclick = () => {
+            if (this.tabs.size === 1) {
+                return;
+            }
+
             this.tabs.delete(tab);
 
             if (tab === this.current) {
-                this.emit("open", this.current = [...this.tabs][this.tabs.size - 1]);
+                this.open(this.current = [...this.tabs][this.tabs.size - 1]);
+            } else {
+                this.update();
             }
-
-            this.update();
             this.emit("delete", this.current);
         };
+        */
 
         return element;
     }

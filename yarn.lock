@@ -815,6 +815,17 @@
     "@parcel/node-resolver-core" "3.0.2"
     "@parcel/plugin" "2.9.2"
 
+"@parcel/resolver-glob@^2.9.2":
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/@parcel/resolver-glob/-/resolver-glob-2.9.2.tgz#45a4284989303d1f8e01642431d3fa918acab3ab"
+  integrity sha512-CbZdTn0Utg2e7yuLE/ONq1QAc/kqkDcfM3qafzcSxK7gRnGC9NtiO8JgDNCRmxbfh+sTSRxcwxKEjZi7zN8p3w==
+  dependencies:
+    "@parcel/diagnostic" "2.9.2"
+    "@parcel/node-resolver-core" "3.0.2"
+    "@parcel/plugin" "2.9.2"
+    "@parcel/utils" "2.9.2"
+    nullthrows "^1.1.1"
+
 "@parcel/runtime-browser-hmr@2.9.2":
   version "2.9.2"
   resolved "https://registry.yarnpkg.com/@parcel/runtime-browser-hmr/-/runtime-browser-hmr-2.9.2.tgz#33c10757eceef057c9b847e41fb09e9e4c9a577a"
