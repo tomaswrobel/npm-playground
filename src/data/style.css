@@ -120,3 +120,11 @@ li {
 button:not(.active)>.close {
     visibility: hidden;
 }
+
+.icon-delete {
+    float: right;
+}
+
+:not(:hover) > .icon-delete {
+    display: none;
+}

@@ -3,6 +3,7 @@ import {FileOpenEvent, FileDeleteEvent} from "../classes/file-events";
 import {saveAs} from "file-saver";
 import css from "bundle-text:../data/css.txt?raw";
 import js from "bundle-text:../data/js.txt?raw";
+import getIcon from "./get-icon";
 
 class FileExplorer extends Component.create({
     tag: "ul",
@@ -34,6 +35,7 @@ class FileExplorer extends Component.create({
             this.saveAs = this.li("Export...", this.download),
             this.newFile = this.li("New file...", () => {
                 const li = this.element.appendChild(document.createElement("li"));
+                li.appendChild(getIcon(""));
                 const input = li.appendChild(document.createElement("input"));
 
                 input.onblur = () => {
@@ -54,7 +56,13 @@ class FileExplorer extends Component.create({
                     }
                 };
 
-                document.activeElement?.blur();
+                input.oninput = () => {
+                    li.replaceChild(getIcon(input.value), li.firstElementChild!);
+                };
+
+                if (document.activeElement instanceof HTMLElement) {
+                    document.activeElement.blur();
+                }
                 input.focus();
             }),
             this.itemsDivider = this.divider()
@@ -76,7 +84,16 @@ class FileExplorer extends Component.create({
         )
 
         for (const file of this.fileSystem.keys()) {
-            this.element.appendChild(this.li(file, this.emit.bind(this, "open", file)));
+            const li = this.element.appendChild(this.li(file, this.emit.bind(this, "open", file)));
+            li.prepend(getIcon(file));
+            const remove = document.createElement("span");
+            remove.classList.add("icon-delete");
+            remove.onclick = () => {
+                this.fileSystem.delete(file);
+                this.emit("delete", file);
+                this.update();
+            }; 
+            li.append(remove);
         }
     }
 

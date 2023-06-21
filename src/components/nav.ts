@@ -2,6 +2,8 @@ import Component from "../classes/component";
 import {FileDeleteEvent, FileOpenEvent} from "../classes/file-events";
 import fileExplorer from "./file-explorer";
 import preview from "./preview";
+import "../data/fontello.css";
+import getIcon from "./get-icon";
 
 class Nav extends Component.create({
     tag: "nav",
@@ -34,9 +36,8 @@ class Nav extends Component.create({
         for (const tab of this.tabs) {
             const button = document.createElement("button");
             button.onclick = this.open.bind(this, tab);
-            button.append(tab, this.closeButton(tab));
+            button.append(getIcon(tab), tab, this.closeButton(tab));
             button.dataset.tab = tab;
-
             this.element.appendChild(button);
         }
 
@@ -53,7 +54,9 @@ class Nav extends Component.create({
     }
 
     open(tab: string) {
-        this.tabs.add(tab);
+        if (!this.tabs.has(tab)) {
+            this.tabs.add(tab);
+        }
         this.current = tab;
         this.update();
         this.emit("open", tab);
@@ -74,13 +77,13 @@ class Nav extends Component.create({
         element.classList.add("close");
         element.onclick = () => {
             this.tabs.delete(tab);
-            element.closest("button")!.remove();
 
             if (tab === this.current) {
-                this.current = [...this.tabs][this.tabs.size - 1];
+                this.emit("open", this.current = [...this.tabs][this.tabs.size - 1]);
             }
 
-            this.emit("delete", tab);
+            this.update();
+            this.emit("delete", this.current);
         };
 
         return element;
