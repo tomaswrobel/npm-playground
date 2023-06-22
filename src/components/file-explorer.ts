@@ -1,8 +1,6 @@
 import Component from "../classes/component";
 import {FileOpenEvent, FileDeleteEvent} from "../classes/file-events";
 import {saveAs} from "file-saver";
-import css from "bundle-text:../data/css.txt?raw";
-import js from "bundle-text:../data/js.txt?raw";
 import getIcon from "./get-icon";
 import licenses from "../licenses";
 
@@ -13,10 +11,7 @@ class FileExplorer extends Component.create({
         delete: FileDeleteEvent
     },
     props: {
-        fileSystem: new Map([
-            ["index.tsx", js],
-            ["index.css", css]
-        ])
+        fileSystem: new Map()
     }
 }) {
     init() {
@@ -34,7 +29,7 @@ class FileExplorer extends Component.create({
             this.licenses = this.li("Licenses", licenses),
             this.divider(),
             this.open = this.li("Open...", this.upload.bind(this)),
-            this.saveAs = this.li("Export...", this.download),
+            this.saveAs = this.li("Export...", this.download.bind(this)),
             this.newFile = this.li("New file...", () => {
                 const li = this.element.appendChild(document.createElement("li"));
                 li.appendChild(getIcon(""));
@@ -95,7 +90,7 @@ class FileExplorer extends Component.create({
                 this.fileSystem.delete(file);
                 this.emit("delete", file);
                 this.update();
-            }; 
+            };
             li.append(remove);
         }
     }
@@ -114,25 +109,31 @@ class FileExplorer extends Component.create({
     }
 
     private download() {
-        saveAs(new Blob([JSON.stringify([...this.fileSystem])], {type: "application/json"}), "untitled.npmplg");
+        saveAs(new Blob([JSON.stringify([...this.fileSystem])], {type: "application/npmplg"}), "untitled.npmplg");
     }
 
     private upload() {
         const input = document.createElement("input");
         input.type = "file";
         input.accept = ".npmplg";
-        input.onchange = async () => {
+        input.onchange = () => {
             const [file] = input.files!;
             if (file) {
-                this.fileSystem.clear();
-                for (const [key, value] of JSON.parse(await file.text())) {
-                    this.fileSystem.set(key, value);
-                }
-                this.update();
+                this.openFile(file);
             }
         };
 
         input.click();
+    }
+
+    async openFile(file: File) {
+        this.fileSystem.clear();
+        console.log(file);
+        for (const [key, value] of JSON.parse(await file.text())) {
+            this.fileSystem.set(key, value);
+        }
+        this.update();
+        this.emit("open", "index.tsx");
     }
 }
 

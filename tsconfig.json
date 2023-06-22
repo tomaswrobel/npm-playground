@@ -6,7 +6,13 @@
         "module": "ESNext",
         "resolveJsonModule": true,
         "moduleResolution": "node",
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "lib": [
+            "DOM",
+            "DOM.Iterable",
+            "ES2015",
+            "ScriptHost"
+        ]
     },
     "include": [
         "src"

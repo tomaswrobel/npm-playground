@@ -35,7 +35,7 @@ class Preview extends Component.create({
                 const file = filename.slice(0, filename.lastIndexOf("."));
                 const ext = filename.slice(filename.lastIndexOf(".") + 1);
 
-                if (["ts", "tsx", "js", "jsx"].includes(ext)) {
+                if (["ts", "tsx", "js", "jsx"].indexOf(ext) > -1) {
                     const presets = [];
 
                     if (ext[0] === "t") {

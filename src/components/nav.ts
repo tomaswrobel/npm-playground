@@ -2,7 +2,7 @@ import Component from "../classes/component";
 import {FileDeleteEvent, FileOpenEvent} from "../classes/file-events";
 import fileExplorer from "./file-explorer";
 import preview from "./preview";
-import "../data/fontello.css";
+import "../assets/fontello.css";
 import getIcon from "./get-icon";
 
 class Nav extends Component.create({
@@ -12,7 +12,7 @@ class Nav extends Component.create({
         delete: FileDeleteEvent
     },
     props: {
-        tabs: new Set(["index.tsx"]),
+        tabs: ["index.tsx"],
         current: "index.tsx"
     }
 }) {
@@ -22,7 +22,10 @@ class Nav extends Component.create({
         });
 
         fileExplorer.on("delete", e => {
-            if (this.tabs.delete(e.file)) {
+            const index = this.tabs.indexOf(e.file);
+
+            if (index > -1) {
+                this.tabs.splice(index, 1);
                 this.update();
             }
         });
@@ -54,7 +57,9 @@ class Nav extends Component.create({
     }
 
     open(tab: string) {
-        this.tabs.add(tab);
+        if (this.tabs.indexOf(tab) === -1) {
+            this.tabs.push(tab);
+        }
         this.current = tab;
         this.update();
         this.emit("open", tab);
@@ -73,22 +78,22 @@ class Nav extends Component.create({
         const element = document.createElement("span");
 
         element.classList.add("close");
-        /* Not implemented yet
-        element.onclick = () => {
-            if (this.tabs.size === 1) {
+        element.onclick = e => {
+            e.stopPropagation();
+
+            if (this.tabs.length === 1) {
                 return;
             }
-
-            this.tabs.delete(tab);
+            
+            this.tabs.splice(this.tabs.indexOf(tab), 1);
 
             if (tab === this.current) {
-                this.open(this.current = [...this.tabs][this.tabs.size - 1]);
+                this.open(this.tabs[this.tabs.length - 1]);
             } else {
                 this.update();
             }
             this.emit("delete", this.current);
         };
-        */
 
         return element;
     }

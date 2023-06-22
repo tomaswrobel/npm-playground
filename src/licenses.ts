@@ -1,9 +1,7 @@
-import * as packages from "bundle-text:../node_modules/*/LICENSE";
-import license from "bundle-text:../LICENSE";
-import {name} from "../package.json";
+import * as packages from "./packages";
 
 export default function () {
-    let licenses = `${name}\n${license}\n\n`;
+    let licenses = "";
 
     for (const name in packages) {
         licenses += `${name}\n${packages[name as keyof typeof packages]}\n\n`;
