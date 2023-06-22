@@ -25,6 +25,7 @@ class Nav extends Component.create({
             const index = this.tabs.indexOf(e.file);
 
             if (index > -1) {
+                this.current = this.tabs[this.tabs.length - 1];
                 this.tabs.splice(index, 1);
                 this.update();
             }

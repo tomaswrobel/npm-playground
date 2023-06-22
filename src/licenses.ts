@@ -1,3 +1,4 @@
+import preview from "./components/preview";
 import * as packages from "./packages";
 
 export default function () {
@@ -7,5 +8,5 @@ export default function () {
         licenses += `${name}\n${packages[name as keyof typeof packages]}\n\n`;
     }
 
-    window.open(`data:text/plain;charset=utf-8,${encodeURIComponent(licenses)}`, "output");
+    preview.element.src = `data:text/plain;charset=utf-8,${encodeURIComponent(licenses)}`;
 }

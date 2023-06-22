@@ -2,6 +2,7 @@ import Component from "../classes/component";
 import EventEmitter from "../classes/event-emitter";
 import fileExplorer from "./file-explorer";
 import * as babel from "@babel/core";
+import main from "bundle-text:../assets/main.txt";
 
 class Preview extends Component.create({
     tag: "iframe",
@@ -10,6 +11,15 @@ class Preview extends Component.create({
         imports: {"npm/": "https://esm.sh/"} as Record<string, string>
     }
 }) {
+    release() {
+        for (const src in this.imports) {
+            if (src !== "npm/") {
+                URL.revokeObjectURL(this.imports[src]);
+                delete this.imports[src];
+            }
+        }
+    }
+
     init() {
         this.element.name = "output";
 
@@ -17,17 +27,16 @@ class Preview extends Component.create({
             this.element.src = "about:blank";
         });
 
+        this.element.onerror = e => {
+            this.element.src = `data:text/plain;charset=utf-8,${encodeURIComponent(String(e))}`;
+        };
+
         this.element.onload = async () => {
             if (this.element.src !== "about:blank") {
                 return;
             }
-
-            for (const src in this.imports) {
-                if (src !== "npm/") {
-                    URL.revokeObjectURL(this.imports[src]);
-                    delete this.imports[src];
-                }
-            }
+            
+            this.release();
 
             const document = this.element.contentDocument!;
 
@@ -46,27 +55,33 @@ class Preview extends Component.create({
                         presets.push(require("@babel/preset-react"));
                     }
 
-                    const js = await babel.transformAsync(content, {
-                        presets,
-                        plugins: [
-                            {
-                                visitor: {
-                                    ImportDeclaration(path) {
-                                        if (path.node.source.value.startsWith("./")) {
-                                            path.node.source.value = path.node.source.value.replace("./", "local/");
-                                        } else {
-                                            path.node.source.value = `npm/${path.node.source.value}`;
-                                        }
+                    try {
+                        var js = await babel.transformAsync(content, {
+                            presets,
+                            plugins: [
+                                {
+                                    visitor: {
+                                        ImportDeclaration(path) {
+                                            if (path.node.source.value.startsWith("./")) {
+                                                path.node.source.value = path.node.source.value.replace("./", "local/");
+                                            } else {
+                                                path.node.source.value = `npm/${path.node.source.value}`;
+                                            }
+                                        },
                                     },
                                 },
-                            },
-                        ],
-                        filename,
-                        minified: true,
-                    });
+                            ],
+                            filename,
+                            minified: true,
+                        })!;
 
-                    if (!js) {
-                        continue;
+                        if (!js) {
+                            throw "Unknown error.";
+                        }
+                    } catch (e) {
+                        var js: babel.BabelFileResult | null = {
+                            code: `throw ${JSON.stringify(String(e))};`
+                        };
                     }
 
                     this.imports[`local/${file}`] = URL.createObjectURL(
@@ -95,8 +110,7 @@ class Preview extends Component.create({
             document.head.appendChild(importmap);
 
             const script = document.createElement("script");
-            script.type = "module";
-            script.textContent = "import 'local/index';";
+            script.textContent = main;
             document.body.appendChild(script);
         };
     }
