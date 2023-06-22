@@ -13,7 +13,7 @@ class Nav extends Component.create({
     },
     props: {
         tabs: ["index.tsx"],
-        current: "index.tsx"
+        current: "index.tsx" as string | undefined
     }
 }) {
     init() {
@@ -52,13 +52,13 @@ class Nav extends Component.create({
         const button = document.createElement("button");
         button.textContent = "▶";
         button.onclick = () => {
-            preview.emit("run");
+            preview.element.src = "about:blank";
         };
         this.element.appendChild(button);
     }
 
-    open(tab: string) {
-        if (this.tabs.indexOf(tab) === -1) {
+    open(tab?: string) {
+        if (tab && this.tabs.indexOf(tab) === -1) {
             this.tabs.push(tab);
         }
         this.current = tab;
@@ -71,7 +71,14 @@ class Nav extends Component.create({
             active.classList.remove("active");
         }
         if (this.current) {
-            this.element.querySelector(`[data-tab="${this.current}"]`)!.classList.add("active");
+            const active = this.element.querySelector(`[data-tab="${this.current}"]`);
+
+            if (active) {
+                active.classList.add("active")
+            } else {
+                delete this.current;
+                this.emit("open")
+            }
         }
     }
 
@@ -81,10 +88,6 @@ class Nav extends Component.create({
         element.classList.add("close");
         element.onclick = e => {
             e.stopPropagation();
-
-            if (this.tabs.length === 1) {
-                return;
-            }
             
             this.tabs.splice(this.tabs.indexOf(tab), 1);
 
@@ -93,7 +96,7 @@ class Nav extends Component.create({
             } else {
                 this.update();
             }
-            this.emit("delete", this.current);
+            this.emit("delete", tab);
         };
 
         return element;

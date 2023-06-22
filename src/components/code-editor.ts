@@ -39,9 +39,17 @@ class CodeEditor extends Component.create({
         };
 
         nav.on("open", e => {
-            this.textarea.value = this.prism.textContent = fileExplorer.fileSystem.get(e.file) || "";
-            this.prism.className = `language-${e.file.split(".").pop()}`;
-            Prism.highlightElement(this.prism);
+            if (e.file) {
+                this.textarea.value = this.prism.textContent = fileExplorer.fileSystem.get(e.file)!;
+                this.prism.className = `language-${e.file.split(".").pop()}`;
+                Prism.highlightElement(this.prism);
+                this.textarea.readOnly = false;
+            } else {
+                this.textarea.value = "";
+                this.prism.textContent = "";
+                this.prism.className = "";
+                this.textarea.readOnly = true;
+            }
         });
 
         nav.emit("open", "index.tsx");

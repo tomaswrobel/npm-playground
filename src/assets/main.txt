@@ -1,9 +1,7 @@
-async function main() {
-    try {
-        await import("local/index");
-    } catch (e) {
-        frameElement.src = `data:text/plain;charset=utf-8,${encodeURIComponent(String(e))}`;
-    }
-}
-
-main();
+(async function () {
+	try {
+		await import("local/index");
+	} catch (e) {
+		frameElement.src = `data:text/plain;charset=utf-8,${encodeURIComponent(String(e))}`;
+	}
+})();

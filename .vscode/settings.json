@@ -1,3 +1,8 @@
 {
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "files.associations": {
+        "**/assets/main.txt": "javascript",
+        "**/assets/js.txt": "javascript",
+        "**/assets/css.txt": "css",
+    },
 }

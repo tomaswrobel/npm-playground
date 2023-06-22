@@ -128,3 +128,12 @@ button:not(.active)>.close {
 :not(:hover) > .icon-delete {
     display: none;
 }
+
+pre:not([class^="language-"]) {
+    background: #272822;
+    color: #c9d1d9;
+}
+
+pre:not([class^="language-"])::after {
+    content: "Open a file...";
+}

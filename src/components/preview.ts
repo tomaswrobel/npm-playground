@@ -6,7 +6,6 @@ import main from "bundle-text:../assets/main.txt";
 
 class Preview extends Component.create({
     tag: "iframe",
-    events: EventEmitter.events("run"),
     props: {
         imports: {"npm/": "https://esm.sh/"} as Record<string, string>
     }
@@ -21,21 +20,11 @@ class Preview extends Component.create({
     }
 
     init() {
-        this.element.name = "output";
-
-        this.on("run", () => {
-            this.element.src = "about:blank";
-        });
-
-        this.element.onerror = e => {
-            this.element.src = `data:text/plain;charset=utf-8,${encodeURIComponent(String(e))}`;
-        };
-
         this.element.onload = async () => {
             if (this.element.src !== "about:blank") {
                 return;
             }
-            
+
             this.release();
 
             const document = this.element.contentDocument!;
@@ -104,14 +93,16 @@ class Preview extends Component.create({
                 }
             }
 
+            this.imports["local/index"] ||= `data:application/javascript,${encodeURIComponent('throw "No entry point found. Try to create index.js, index.ts, index.jsx or index.tsx.";')}`;
+
             const importmap = document.createElement("script");
             importmap.type = "importmap";
             importmap.textContent = JSON.stringify({imports: this.imports});
             document.head.appendChild(importmap);
-
             const script = document.createElement("script");
             script.textContent = main;
             document.body.appendChild(script);
+
         };
     }
 }

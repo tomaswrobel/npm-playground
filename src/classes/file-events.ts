@@ -1,5 +1,5 @@
 export class FileOpenEvent extends Event {
-    constructor(public file: string) {
+    constructor(public file?: string) {
         super("open");
     }
 }

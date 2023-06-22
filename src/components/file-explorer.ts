@@ -84,9 +84,6 @@ class FileExplorer extends Component.create({
         for (const file of this.fileSystem.keys()) {
             const li = this.element.appendChild(this.li(file, this.emit.bind(this, "open", file)));
             li.prepend(getIcon(file));
-            if (file === "index.tsx") {
-                continue;
-            }
             const remove = document.createElement("span");
             remove.classList.add("icon-delete");
             remove.onclick = e => {
