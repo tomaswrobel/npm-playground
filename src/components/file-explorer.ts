@@ -3,6 +3,7 @@ import {FileOpenEvent, FileDeleteEvent} from "../classes/file-events";
 import {saveAs} from "file-saver";
 import getIcon from "./get-icon";
 import licenses from "../licenses";
+import preview from "./preview";
 
 class FileExplorer extends Component.create({
     tag: "ul",
@@ -11,7 +12,7 @@ class FileExplorer extends Component.create({
         delete: FileDeleteEvent
     },
     props: {
-        fileSystem: new Map()
+        fileSystem: new Map<string, string>()
     }
 }) {
     init() {
@@ -26,7 +27,7 @@ class FileExplorer extends Component.create({
                     "_blank"
                 )
             ),
-            this.licenses = this.li("Licenses", licenses),
+            this.licenses = this.li("Licenses", () => preview.element.src = licenses),
             this.divider(),
             this.open = this.li("Open...", this.upload.bind(this)),
             this.saveAs = this.li("Export...", this.download.bind(this)),
