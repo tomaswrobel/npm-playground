@@ -15,12 +15,15 @@ class CodeEditor extends Component.create({
     tag: "main",
     props: {
         textarea: document.createElement("textarea"),
-        prism: document.createElement("pre")
+        prism: document.createElement("pre"),
+        nums: document.createElement("div")
     }
 }) {
     init() {
         this.textarea.spellcheck = false;
         this.textarea.autocapitalize = "off";
+        this.nums.style.gridArea = "nums";
+        this.nums.classList.add("nums");
 
         this.textarea.addEventListener(
             "input",
@@ -28,6 +31,7 @@ class CodeEditor extends Component.create({
                 fileExplorer.fileSystem.set(nav.current, this.textarea.value);
                 this.prism.textContent = this.textarea.value;
                 Prism.highlightElement(this.prism);
+                this.update();
             }
         );
 
@@ -50,10 +54,16 @@ class CodeEditor extends Component.create({
                 this.prism.className = "";
                 this.textarea.readOnly = true;
             }
+            this.update();
         });
 
         nav.emit("open", "index.tsx");
+        document.body.appendChild(this.nums);
         this.element.append(this.prism, this.textarea);
+    }
+
+    update() {
+        this.nums.innerHTML = this.textarea.value.split("\n").map((_, i) => i + 1).join("<br>");
     }
 }
 
