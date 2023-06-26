@@ -58,8 +58,7 @@ class CodeEditor extends Component.create({
         });
 
         nav.emit("open", "index.tsx");
-        document.body.appendChild(this.nums);
-        this.element.append(this.prism, this.textarea);
+        this.element.append(this.prism, this.textarea, this.nums);
     }
 
     update() {

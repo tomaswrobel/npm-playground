@@ -1,6 +1,6 @@
 body {
     display: grid;
-    grid-template-areas: "file-explorer tabs tabs preview" "file-explorer nums editor preview";
+    grid-template-areas: "file-explorer tabs preview" "file-explorer editor preview";
     grid-template-rows: auto 1fr;
     grid-template-columns: 200px auto 1fr 1fr;
     width: 100vw;
@@ -15,15 +15,16 @@ nav {
 
 main {
     grid-area: editor;
-    overflow: scroll;
+    overflow: auto;
     display: grid;
+    grid-template-areas: "nums pre";
 }
 
 textarea,
 pre {
     all: unset;
     overflow: unset !important;
-    grid-area: 1 / 1;
+    grid-area: pre;
     white-space: pre !important;
 }
 
