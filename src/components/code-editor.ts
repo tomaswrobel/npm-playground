@@ -22,7 +22,6 @@ class CodeEditor extends Component.create({
     init() {
         this.textarea.spellcheck = false;
         this.textarea.autocapitalize = "off";
-        this.nums.style.gridArea = "nums";
         this.nums.classList.add("nums");
 
         this.textarea.addEventListener(
