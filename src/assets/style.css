@@ -18,6 +18,7 @@ main {
     overflow: auto;
     display: grid;
     grid-template-areas: "nums pre";
+    grid-template-columns: auto 1fr;
 }
 
 textarea,
