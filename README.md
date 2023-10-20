@@ -2,6 +2,9 @@
 
 [Try it](https://npm-playground.web.app)
 
+## No longer maintained
+NPM Playground is now deprecated in favor of [PlayGist](https://playgist.dev)
+
 ## Supported files
 - TypeScript
 - JavaScript
